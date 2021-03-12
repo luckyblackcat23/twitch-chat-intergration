@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 public class TwitchChat : MonoBehaviour
 {
-    //some of this stuff is from the game im working on please remove it if you dont need it (ballPrefab and spawn point)
+    //some of this stuff is from the game im working on please remove it if you dont need it (ballPrefab and spawnPoint)
     private TcpClient twitchClient;
     private StreamReader reader;
     private StreamWriter writer;
@@ -22,8 +22,6 @@ public class TwitchChat : MonoBehaviour
     public string username, token, channelName; //Get the token from https://twitchapps.com/tmi
 
     public Text chatBox;
-
-    public ScriptableObject scoreboardstuff;
 
     void Start()
     {
@@ -37,30 +35,34 @@ public class TwitchChat : MonoBehaviour
         token = datastuff.OAuthToken;
         channelName = datastuff.channelName;
     }
-
+    
+    //connects to twitch
     void Update()
     {
         if (!twitchClient.Connected)
         {
             Connect();
+            Debug.Log("connected");
         }
 
         ReadChat();
     }
 
+    //called when it connects to twitch and on start
     private void Connect()
     {
         twitchClient = new TcpClient("irc.chat.twitch.tv", 6667);
         reader = new StreamReader(twitchClient.GetStream());
         writer = new StreamWriter(twitchClient.GetStream());
-
-        writer.WriteLine("TOKEN " + token);
+        //DO NOT CHANGE THIS
+        writer.WriteLine("PASS " + token);
         writer.WriteLine("NICK " + username);
         writer.WriteLine("USER " + username + " 8 * :" + username);
         writer.WriteLine("JOIN #" + channelName);
         writer.Flush();
     }
 
+    //called every frame
     private void ReadChat()
     {
         if (twitchClient.Available > 0)
@@ -91,10 +93,13 @@ public class TwitchChat : MonoBehaviour
             }
         }
     }
+
+    //reads chat to add commands
     private void GameInputs(string ChatInputs)
     {
         //example
-        //just remove the string ("left") and change it to what ever you want to add another command
+        //just change the spot where it says "left" to whatever command you want
+        //moves the player left
         /*if (ChatInputs.ToLower() == "left")
         {
             player.AddForce(Vector3.left * (speed * 1000));
