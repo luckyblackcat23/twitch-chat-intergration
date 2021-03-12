@@ -1,0 +1,107 @@
+// feel free to use this for what ever you want, even say you made this entire script if you want (jordan costin)
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System;
+using System.ComponentModel;
+using System.Net.Sockets;
+using System.IO;
+using UnityEngine.UI;
+
+public class TwitchChat : MonoBehaviour
+{
+    //some of this stuff is from the game im working on please remove it if you dont need it (ballPrefab and spawn point)
+    private TcpClient twitchClient;
+    private StreamReader reader;
+    private StreamWriter writer;
+    public GameObject ballPrefab;
+    public Transform spawnPoint;
+    public List<string> users = new List<string>();
+
+    public string username, token, channelName; //Get the token from https://twitchapps.com/tmi
+
+    public Text chatBox;
+
+    public ScriptableObject scoreboardstuff;
+
+    void Start()
+    {
+        Connect();
+    }
+
+    private void Awake()
+    {
+        username = datastuff.Username;
+        token = datastuff.OAuthToken;
+        channelName = datastuff.channelName;
+    }
+
+    void Update()
+    {
+        if (!twitchClient.Connected)
+        {
+            Connect();
+        }
+
+        ReadChat();
+    }
+
+    private void Connect()
+    {
+        twitchClient = new TcpClient("irc.chat.twitch.tv", 6667);
+        reader = new StreamReader(twitchClient.GetStream());
+        writer = new StreamWriter(twitchClient.GetStream());
+
+        writer.WriteLine("TOKEN " + token);
+        writer.WriteLine("NICK " + username);
+        writer.WriteLine("USER " + username + " 8 * :" + username);
+        writer.WriteLine("JOIN #" + channelName);
+        writer.Flush();
+    }
+
+    private void ReadChat()
+    {
+        if (twitchClient.Available > 0)
+        {
+            var message = reader.ReadLine(); //Read in the current message
+
+            if (message.Contains("PRIVMSG"))
+            {
+                //Get the users name by splitting it from the string
+                var splitPoint = message.IndexOf("!", 1);
+                var chatName = message.Substring(0, splitPoint);
+                chatName = chatName.Substring(1);
+
+                //Get the users message by splitting it from the string
+                splitPoint = message.IndexOf(":", 1);
+                message = message.Substring(splitPoint + 1);
+                //print(String.Format("{0}: {1}", chatName, message));
+                chatBox.text = chatBox.text + "\n" + String.Format("{0}: {1}", chatName, message);
+
+                //Run the instructions to control the game!
+                GameInputs(message);
+
+                //gets a list of everyone who chats (i didnt do anything with this yet)
+                if (!users.Contains(chatName))
+                {
+                    users.Add(chatName);
+                }
+            }
+        }
+    }
+    private void GameInputs(string ChatInputs)
+    {
+        //example
+        //just remove the string ("left") and change it to what ever you want to add another command
+        /*if (ChatInputs.ToLower() == "left")
+        {
+            player.AddForce(Vector3.left * (speed * 1000));
+        }*/
+
+        if (ChatInputs.ToLower() == "!ball")
+        {
+            Instantiate(ballPrefab, spawnPoint.position, spawnPoint.rotation);
+        }
+    }
+}
