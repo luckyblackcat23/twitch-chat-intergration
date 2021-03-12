@@ -6,3 +6,5 @@ if your username is the same as your channel name keep them the same in the insp
 
 known issue:
 sometimes if theres to many commands at once you need to get another token (just go back to the link and hit generate again)
+
+more info here https://dev.twitch.tv/docs/irc/guide
