@@ -1,5 +1,5 @@
-// feel free to use this for what ever you want, even say you made this entire script if you want if you really want to just delete this entire message (jordan costin)
-
+//feel free to use this for what ever you want, even say you made this entire script if you want (jordan costin)
+//this is mainly for unity may not work for other engines
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +32,7 @@ public class TwitchChat : MonoBehaviour
 
     private void Awake()
     {
+        //change them in the inspector or do what i did and put a script on an empty object and put the data on there(the data was from an input field in unity)
         username = datastuff.Username;
         token = datastuff.OAuthToken;
         channelName = datastuff.channelName;
